@@ -4,6 +4,7 @@ import 'package:client/auth/view/widgets/auth_gradient_button.dart';
 import 'package:client/auth/view/widgets/custom_field.dart';
 import 'package:client/config/theme/color_palette.dart';
 import 'package:flutter/material.dart';
+import 'package:fpdart/fpdart.dart';
 
 class SignupPage extends StatefulWidget {
   static route() => MaterialPageRoute(builder: (context) => SignupPage());
@@ -56,11 +57,17 @@ class _SignupPageState extends State<SignupPage> {
               AuthGradientButton(
                 text: "Sign Up",
                 onTap: () async {
-                  await AuthRemoteRepository().signup(
+                  final res = await AuthRemoteRepository().signup(
                     name: nameController.text.trim(),
                     email: emailController.text.trim(),
                     password: passwordController.text.trim(),
                   );
+
+                  final val = switch (res) {
+                    Left(value: final l) => l,
+                    Right(value: final r) => r,
+                  };
+                  print(val);
                 },
               ),
               SizedBox(height: 20),
