@@ -1,5 +1,4 @@
 import 'package:client/auth/view/pages/login_page.dart';
-import 'package:client/auth/view/pages/signup_page.dart';
 import 'package:client/config/theme/theme.dart';
 import 'package:flutter/material.dart';
 

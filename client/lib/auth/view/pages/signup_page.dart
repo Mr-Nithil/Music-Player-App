@@ -1,9 +1,12 @@
+import 'package:client/auth/repository/auth_remote_repository.dart';
+import 'package:client/auth/view/pages/login_page.dart';
 import 'package:client/auth/view/widgets/auth_gradient_button.dart';
 import 'package:client/auth/view/widgets/custom_field.dart';
 import 'package:client/config/theme/color_palette.dart';
 import 'package:flutter/material.dart';
 
 class SignupPage extends StatefulWidget {
+  static route() => MaterialPageRoute(builder: (context) => SignupPage());
   const SignupPage({super.key});
 
   @override
@@ -50,21 +53,35 @@ class _SignupPageState extends State<SignupPage> {
                 isObscureText: true,
               ),
               SizedBox(height: 20),
-              AuthGradientButton(text: "Sign Up", onTap: () {}),
+              AuthGradientButton(
+                text: "Sign Up",
+                onTap: () async {
+                  await AuthRemoteRepository().signup(
+                    name: nameController.text.trim(),
+                    email: emailController.text.trim(),
+                    password: passwordController.text.trim(),
+                  );
+                },
+              ),
               SizedBox(height: 20),
-              RichText(
-                text: TextSpan(
-                  text: "Already have an account? ",
-                  style: Theme.of(context).textTheme.titleMedium,
-                  children: [
-                    TextSpan(
-                      text: "Sign In",
-                      style: TextStyle(
-                        color: ColorPalette.gradient2,
-                        fontWeight: FontWeight.bold,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context, LoginPage.route());
+                },
+                child: RichText(
+                  text: TextSpan(
+                    text: "Already have an account? ",
+                    style: Theme.of(context).textTheme.titleMedium,
+                    children: [
+                      TextSpan(
+                        text: "Sign In",
+                        style: TextStyle(
+                          color: ColorPalette.gradient2,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],

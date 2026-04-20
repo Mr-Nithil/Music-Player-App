@@ -1,9 +1,12 @@
+import 'package:client/auth/repository/auth_remote_repository.dart';
+import 'package:client/auth/view/pages/signup_page.dart';
 import 'package:client/auth/view/widgets/auth_gradient_button.dart';
 import 'package:client/auth/view/widgets/custom_field.dart';
 import 'package:client/config/theme/color_palette.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
+  static route() => MaterialPageRoute(builder: (context) => LoginPage());
   const LoginPage({super.key});
 
   @override
@@ -46,21 +49,34 @@ class _LoginPageState extends State<LoginPage> {
                 isObscureText: true,
               ),
               SizedBox(height: 20),
-              AuthGradientButton(text: "Sign In", onTap: () {}),
+              AuthGradientButton(
+                text: "Sign In",
+                onTap: () async {
+                  await AuthRemoteRepository().login(
+                    email: emailController.text.trim(),
+                    password: passwordController.text.trim(),
+                  );
+                },
+              ),
               SizedBox(height: 20),
-              RichText(
-                text: TextSpan(
-                  text: "Don't have an account? ",
-                  style: Theme.of(context).textTheme.titleMedium,
-                  children: [
-                    TextSpan(
-                      text: "Sign Up",
-                      style: TextStyle(
-                        color: ColorPalette.gradient2,
-                        fontWeight: FontWeight.bold,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context, SignupPage.route());
+                },
+                child: RichText(
+                  text: TextSpan(
+                    text: "Don't have an account? ",
+                    style: Theme.of(context).textTheme.titleMedium,
+                    children: [
+                      TextSpan(
+                        text: "Sign Up",
+                        style: TextStyle(
+                          color: ColorPalette.gradient2,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
