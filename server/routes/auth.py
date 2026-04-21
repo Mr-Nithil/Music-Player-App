@@ -3,13 +3,13 @@ import uuid
 import bcrypt
 from fastapi import Depends, HTTPException
 
-from server.models.user import User
-from server.pydantic_schemas.user_create import UserCreate
+from models.user import User
+from pydantic_schemas.user_create import UserCreate
 from fastapi import APIRouter
-from server.database import get_db
+from database import get_db
 from sqlalchemy.orm import Session
 
-from server.pydantic_schemas.user_login import UserLogin
+from pydantic_schemas.user_login import UserLogin
 
 router = APIRouter()
 
