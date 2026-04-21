@@ -1,26 +1,28 @@
-import 'package:client/auth/repository/auth_remote_repository.dart';
-import 'package:client/auth/view/pages/signup_page.dart';
-import 'package:client/auth/view/widgets/auth_gradient_button.dart';
-import 'package:client/auth/view/widgets/custom_field.dart';
+import 'package:client/features/auth/repository/auth_remote_repository.dart';
+import 'package:client/features/auth/view/pages/login_page.dart';
+import 'package:client/features/auth/view/widgets/auth_gradient_button.dart';
+import 'package:client/features/auth/view/widgets/custom_field.dart';
 import 'package:client/config/theme/color_palette.dart';
 import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart';
 
-class LoginPage extends StatefulWidget {
-  static route() => MaterialPageRoute(builder: (context) => LoginPage());
-  const LoginPage({super.key});
+class SignupPage extends StatefulWidget {
+  static route() => MaterialPageRoute(builder: (context) => SignupPage());
+  const SignupPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignupPageState extends State<SignupPage> {
+  final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
+    nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -38,10 +40,12 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "Sign In.",
+                "Sign Up.",
                 style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 30),
+              CustomField(hintText: "Name", controller: nameController),
+              SizedBox(height: 15),
               CustomField(hintText: "Email", controller: emailController),
               SizedBox(height: 15),
               CustomField(
@@ -51,32 +55,35 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 20),
               AuthGradientButton(
-                text: "Sign In",
+                text: "Sign Up",
                 onTap: () async {
-                  final res = await AuthRemoteRepository().login(
-                    email: emailController.text.trim(),
-                    password: passwordController.text.trim(),
-                  );
+                  if (formKey.currentState!.validate()) {
+                    final res = await AuthRemoteRepository().signup(
+                      name: nameController.text.trim(),
+                      email: emailController.text.trim(),
+                      password: passwordController.text.trim(),
+                    );
 
-                  final val = switch (res) {
-                    Left(value: final l) => l,
-                    Right(value: final r) => r,
-                  };
-                  print(val);
+                    final val = switch (res) {
+                      Left(value: final l) => l,
+                      Right(value: final r) => r,
+                    };
+                    print(val);
+                  }
                 },
               ),
               SizedBox(height: 20),
               GestureDetector(
                 onTap: () {
-                  Navigator.push(context, SignupPage.route());
+                  Navigator.push(context, LoginPage.route());
                 },
                 child: RichText(
                   text: TextSpan(
-                    text: "Don't have an account? ",
+                    text: "Already have an account? ",
                     style: Theme.of(context).textTheme.titleMedium,
                     children: [
                       TextSpan(
-                        text: "Sign Up",
+                        text: "Sign In",
                         style: TextStyle(
                           color: ColorPalette.gradient2,
                           fontWeight: FontWeight.bold,

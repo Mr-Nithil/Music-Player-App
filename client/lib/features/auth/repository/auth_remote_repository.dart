@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:client/auth/model/user_model.dart';
+import 'package:client/core/constants/server_constant.dart';
+import 'package:client/features/auth/model/user_model.dart';
 import 'package:client/core/error/app_failure.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:http/http.dart' as http;
@@ -13,7 +14,7 @@ class AuthRemoteRepository {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/auth/signup'),
+        Uri.parse('${ServerConstant.serverURL}/auth/signup'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'name': name, 'email': email, 'password': password}),
       );
@@ -36,7 +37,7 @@ class AuthRemoteRepository {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/auth/login'),
+        Uri.parse('${ServerConstant.serverURL}/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
       );
