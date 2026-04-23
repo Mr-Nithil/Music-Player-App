@@ -33,7 +33,7 @@ class AuthRemoteRepository {
         return Left(AppFailure(resBodyMap['detail']));
       }
 
-      return Right(UserModel.fromJson(response.body));
+      return Right(UserModel.fromMap(resBodyMap));
     } catch (e) {
       return Left(AppFailure(e.toString()));
     }
@@ -56,7 +56,11 @@ class AuthRemoteRepository {
         return Left(AppFailure(resBodyMap['detail']));
       }
 
-      return Right(UserModel.fromJson(response.body));
+      return Right(
+        UserModel.fromMap(
+          resBodyMap['user'],
+        ).copyWith(token: resBodyMap['token']),
+      );
     } catch (e) {
       return Left(AppFailure(e.toString()));
     }

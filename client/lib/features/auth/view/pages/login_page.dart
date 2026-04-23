@@ -1,6 +1,5 @@
 import 'package:client/core/utils/utils.dart';
 import 'package:client/core/widgets/loader.dart';
-import 'package:client/features/auth/repository/auth_remote_repository.dart';
 import 'package:client/features/auth/view/pages/signup_page.dart';
 import 'package:client/features/auth/view/widgets/auth_gradient_button.dart';
 import 'package:client/features/auth/view/widgets/custom_field.dart';
@@ -8,7 +7,6 @@ import 'package:client/config/theme/color_palette.dart';
 import 'package:client/features/auth/viewmodel/auth_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fpdart/fpdart.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   static route() => MaterialPageRoute(builder: (context) => LoginPage());
