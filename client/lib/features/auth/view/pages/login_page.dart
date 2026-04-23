@@ -38,8 +38,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     ref.listen(authViewModelProvider, (_, next) {
       next?.when(
         data: (data) {
-          // TODO: Navigate to HomePage
-          // Navigator.push(context, LoginPage.route());
+          Navigator.pushAndRemoveUntil(
+            context,
+            LoginPage.route(),
+            (_) => false,
+          );
         },
         error: (error, st) {
           showSnackbar(context, error.toString());

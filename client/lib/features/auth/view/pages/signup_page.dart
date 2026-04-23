@@ -41,7 +41,11 @@ class _SignupPageState extends ConsumerState<SignupPage> {
       next?.when(
         data: (data) {
           showSnackbar(context, 'Account created successfully please log in!');
-          Navigator.push(context, LoginPage.route());
+          Navigator.pushAndRemoveUntil(
+            context,
+            LoginPage.route(),
+            (_) => false,
+          );
         },
         error: (error, st) {
           showSnackbar(context, error.toString());
