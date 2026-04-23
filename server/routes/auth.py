@@ -2,7 +2,7 @@ import os
 import uuid
 
 import bcrypt
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Header
 import jwt
 
 from models.user import User
@@ -14,6 +14,8 @@ from sqlalchemy.orm import Session
 from pydantic_schemas.user_login import UserLogin
 
 from dotenv import load_dotenv
+
+from middleware.auth_middleware import auth_middleware
 
 load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -55,3 +57,12 @@ def login_user(user: UserLogin, db: Session=Depends(get_db)):
     token = jwt.encode({'id': user_db.id},SECRET_KEY)
     
     return {'token':token, 'user': user_db}
+
+@router.get('/')
+def get_current_user(db: Session=Depends(get_db), user_dict = Depends(auth_middleware)):
+    user = db.query(User).filter(User.id == user_dict['uid']).first()
+
+    if not user:
+        raise HTTPException(404, 'User not found!')
+    
+    return user
