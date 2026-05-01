@@ -70,5 +70,7 @@
 	<string>As this is a music player app user can upload music to its player. so for that it needs permission.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>User is able to add custom images for track wallpapers.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app requires microphone access to record audio.</string>
 </dict>
 </plist>
