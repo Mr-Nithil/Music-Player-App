@@ -92,7 +92,7 @@ class AuthViewModel extends _$AuthViewModel {
 
       return val.value;
     }
-
+    state = null;
     return null;
   }
 

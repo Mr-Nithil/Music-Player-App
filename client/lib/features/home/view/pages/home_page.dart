@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomePage extends ConsumerWidget {
+  static route() => MaterialPageRoute(builder: (context) => HomePage());
   const HomePage({super.key});
 
   @override
