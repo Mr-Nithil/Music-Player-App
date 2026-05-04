@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:client/config/theme/color_palette.dart';
 import 'package:client/core/utils/utils.dart';
 import 'package:client/core/widgets/custom_field.dart';
+import 'package:client/core/widgets/loader.dart';
 import 'package:client/features/home/view/widgets/audio_wave.dart';
+import 'package:client/features/home/viewmodel/home_viewmodel.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +24,7 @@ class _UploadSongPageState extends ConsumerState<UploadSongPage> {
   Color selectedColor = ColorPalette.cardColor;
   File? selectedImage;
   File? selectedAudio;
+  final formKey = GlobalKey<FormState>();
 
   void selectAudio() async {
     final pickedAudio = await pickAudio();
@@ -50,81 +53,121 @@ class _UploadSongPageState extends ConsumerState<UploadSongPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(
+      homeViewModelProvider.select((val) => val?.isLoading == true),
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text("Upload Song"),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.check))],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: [
-              GestureDetector(
-                onTap: selectImage,
-                child: selectedImage != null
-                    ? SizedBox(
-                        height: 150,
-                        width: double.infinity,
-                        child: ClipRRect(
-                          borderRadius: BorderRadiusGeometry.circular(10),
-                          child: Image.file(selectedImage!, fit: BoxFit.cover),
-                        ),
-                      )
-                    : DottedBorder(
-                        options: RoundedRectDottedBorderOptions(
-                          color: ColorPalette.borderColor,
-                          dashPattern: [10, 4],
-                          radius: Radius.circular(10),
-                          strokeCap: StrokeCap.round,
-                        ),
-                        child: SizedBox(
-                          height: 150,
-                          width: double.infinity,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.folder_open_outlined, size: 40),
-                              SizedBox(height: 15),
-                              Text(
-                                "Select the thumbnail for your song",
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-              ),
-              SizedBox(height: 15),
-              selectedAudio != null
-                  ? AudioWave(path: selectedAudio!.path)
-                  : CustomField(
-                      hintText: "Pick Song",
-                      controller: null,
-                      readOnly: true,
-                      onTap: selectAudio,
-                    ),
-              SizedBox(height: 15),
-              CustomField(
-                hintText: "Song Name",
-                controller: songNameController,
-              ),
-              SizedBox(height: 15),
-              CustomField(hintText: "Artist", controller: artistController),
-              SizedBox(height: 20),
-              ColorPicker(
-                pickersEnabled: {ColorPickerType.wheel: true},
-                color: selectedColor,
-                onColorChanged: (Color color) {
-                  setState(() {
-                    selectedColor = color;
-                  });
-                },
-              ),
-            ],
+        actions: [
+          IconButton(
+            onPressed: () {
+              if (formKey.currentState!.validate() &&
+                  selectedAudio != null &&
+                  selectedImage != null) {
+                ref
+                    .read(homeViewModelProvider.notifier)
+                    .uploadSong(
+                      selectedAudio: selectedAudio!,
+                      selectedThumbnail: selectedImage!,
+                      songName: songNameController.text,
+                      artist: artistController.text,
+                      selectedColor: selectedColor,
+                    );
+              } else {
+                showSnackbar(context, "Missing Fields!");
+              }
+            },
+            icon: Icon(Icons.check),
           ),
-        ),
+        ],
       ),
+      body: isLoading
+          ? Loader()
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: selectImage,
+                        child: selectedImage != null
+                            ? SizedBox(
+                                height: 150,
+                                width: double.infinity,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadiusGeometry.circular(
+                                    10,
+                                  ),
+                                  child: Image.file(
+                                    selectedImage!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              )
+                            : DottedBorder(
+                                options: RoundedRectDottedBorderOptions(
+                                  color: ColorPalette.borderColor,
+                                  dashPattern: [10, 4],
+                                  radius: Radius.circular(10),
+                                  strokeCap: StrokeCap.round,
+                                ),
+                                child: SizedBox(
+                                  height: 150,
+                                  width: double.infinity,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.folder_open_outlined,
+                                        size: 40,
+                                      ),
+                                      SizedBox(height: 15),
+                                      Text(
+                                        "Select the thumbnail for your song",
+                                        style: TextStyle(fontSize: 15),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                      ),
+                      SizedBox(height: 15),
+                      selectedAudio != null
+                          ? AudioWave(path: selectedAudio!.path)
+                          : CustomField(
+                              hintText: "Pick Song",
+                              controller: null,
+                              readOnly: true,
+                              onTap: selectAudio,
+                            ),
+                      SizedBox(height: 15),
+                      CustomField(
+                        hintText: "Song Name",
+                        controller: songNameController,
+                      ),
+                      SizedBox(height: 15),
+                      CustomField(
+                        hintText: "Artist",
+                        controller: artistController,
+                      ),
+                      SizedBox(height: 20),
+                      ColorPicker(
+                        pickersEnabled: {ColorPickerType.wheel: true},
+                        color: selectedColor,
+                        onColorChanged: (Color color) {
+                          setState(() {
+                            selectedColor = color;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
     );
   }
 }
