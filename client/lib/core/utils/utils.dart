@@ -22,7 +22,7 @@ Future<File?> pickAudio() async {
     final filePickerRes = await FilePicker.pickFiles(type: FileType.audio);
 
     if (filePickerRes != null) {
-      return File(filePickerRes.files.first.xFile.path);
+      return File(filePickerRes.files.first.path!);
     }
 
     return null;
@@ -36,7 +36,7 @@ Future<File?> pickImage() async {
     final filePickerRes = await FilePicker.pickFiles(type: FileType.image);
 
     if (filePickerRes != null) {
-      return File(filePickerRes.files.first.xFile.path);
+      return File(filePickerRes.files.first.path!);
     }
 
     return null;
