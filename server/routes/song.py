@@ -8,6 +8,8 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
+from models.song import Song
+
 
 router = APIRouter()
 
@@ -19,7 +21,7 @@ cloudinary.config(
 )
 
 
-@router.post("/upload")
+@router.post("/upload", status_code=201)
 def upload_song(
     song: UploadFile = File(...),
     thumbnail: UploadFile = File(...),
@@ -33,9 +35,22 @@ def upload_song(
     song_res = cloudinary.uploader.upload(
         song.file, resource_type="auto", folder=f"songs/{song_id}"
     )
-    print(song_res)
+
     thumbnail_res = cloudinary.uploader.upload(
         thumbnail.file, resource_type="image", folder=f"songs/{song_id}"
     )
-    print(thumbnail_res)
-    return "ok"
+
+    new_song = Song(
+        id=song_id,
+        song_name=song_name,
+        artist=artist,
+        hex_code=hex_code,
+        song_url=song_res["url"],
+        thumbnail_url=thumbnail_res["url"],
+    )
+
+    db.add(new_song)
+    db.commit()
+    db.refresh(new_song)
+
+    return new_song
