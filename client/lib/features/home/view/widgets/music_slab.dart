@@ -11,6 +11,7 @@ class MusicSlab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentSong = ref.watch(currentSongProvider);
+    final songNotifier = ref.read(currentSongProvider.notifier);
 
     if (currentSong == null) {
       return const SizedBox();
@@ -74,9 +75,11 @@ class MusicSlab extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: songNotifier.playPause,
                     icon: Icon(
-                      CupertinoIcons.play_fill,
+                      songNotifier.isPlaying
+                          ? CupertinoIcons.pause_fill
+                          : CupertinoIcons.play_fill,
                       color: ColorPalette.whiteColor,
                     ),
                   ),
@@ -85,17 +88,34 @@ class MusicSlab extends ConsumerWidget {
             ],
           ),
         ),
-        Positioned(
-          bottom: 0,
-          left: 8,
-          child: Container(
-            height: 2,
-            width: 20,
-            decoration: BoxDecoration(
-              color: ColorPalette.whiteColor,
-              borderRadius: BorderRadius.circular(7),
-            ),
-          ),
+        StreamBuilder(
+          stream: songNotifier.audioPlayer?.positionStream,
+          builder: (context, asyncSnapshot) {
+            if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+              return SizedBox();
+            }
+            final position = asyncSnapshot.data;
+            final duration = songNotifier.audioPlayer!.duration;
+
+            double sliderValue = 0.0;
+
+            if (position != null && duration != null) {
+              sliderValue = position.inMilliseconds / duration.inMilliseconds;
+            }
+
+            return Positioned(
+              bottom: 0,
+              left: 8,
+              child: Container(
+                height: 2,
+                width: sliderValue * (MediaQuery.of(context).size.width - 16),
+                decoration: BoxDecoration(
+                  color: ColorPalette.whiteColor,
+                  borderRadius: BorderRadius.circular(7),
+                ),
+              ),
+            );
+          },
         ),
         Positioned(
           bottom: 0,
