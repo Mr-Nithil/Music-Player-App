@@ -54,3 +54,9 @@ def upload_song(
     db.refresh(new_song)
 
     return new_song
+
+
+@router.get("/list", status_code=200)
+def list_songs(db: Session = Depends(get_db), auth_dict=Depends(auth_middleware)):
+    songs = db.query(Song).all()
+    return songs
