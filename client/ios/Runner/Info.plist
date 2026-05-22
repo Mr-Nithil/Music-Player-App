@@ -72,5 +72,10 @@
 	<string>User is able to add custom images for track wallpapers.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app requires microphone access to record audio.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>
