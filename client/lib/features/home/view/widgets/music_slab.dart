@@ -104,11 +104,16 @@ class MusicSlab extends ConsumerWidget {
                     ),
                     IconButton(
                       onPressed: songNotifier.playPause,
-                      icon: Icon(
-                        songNotifier.isPlaying
-                            ? CupertinoIcons.pause_fill
-                            : CupertinoIcons.play_fill,
-                        color: ColorPalette.whiteColor,
+                      icon: ValueListenableBuilder<bool>(
+                        valueListenable: songNotifier.isPlayingNotifier,
+                        builder: (context, isPlaying, child) {
+                          return Icon(
+                            isPlaying
+                                ? CupertinoIcons.pause_fill
+                                : CupertinoIcons.play_fill,
+                            color: ColorPalette.whiteColor,
+                          );
+                        },
                       ),
                     ),
                   ],

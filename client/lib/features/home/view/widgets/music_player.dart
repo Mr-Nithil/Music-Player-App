@@ -12,10 +12,14 @@ class MusicPlayer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentSong = ref.watch(currentSongProvider);
     final songNotifier = ref.read(currentSongProvider.notifier);
+    if (currentSong == null) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [hexToRgb(currentSong!.hex_code), Color(0xff121212)],
+          colors: [hexToRgb(currentSong.hex_code), Color(0xff121212)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -57,7 +61,7 @@ class MusicPlayer extends ConsumerWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: NetworkImage(currentSong!.thumbnail_url),
+                        image: NetworkImage(currentSong.thumbnail_url),
                         fit: BoxFit.cover,
                       ),
                       borderRadius: BorderRadius.circular(10),
@@ -193,11 +197,16 @@ class MusicPlayer extends ConsumerWidget {
                       ),
                       IconButton(
                         onPressed: songNotifier.playPause,
-                        icon: Icon(
-                          songNotifier.isPlaying
-                              ? CupertinoIcons.pause_circle_fill
-                              : CupertinoIcons.play_circle_fill,
-                          color: ColorPalette.whiteColor,
+                        icon: ValueListenableBuilder<bool>(
+                          valueListenable: songNotifier.isPlayingNotifier,
+                          builder: (context, isPlaying, child) {
+                            return Icon(
+                              isPlaying
+                                  ? CupertinoIcons.pause_circle_fill
+                                  : CupertinoIcons.play_circle_fill,
+                              color: ColorPalette.whiteColor,
+                            );
+                          },
                         ),
                         iconSize: 80,
                       ),
