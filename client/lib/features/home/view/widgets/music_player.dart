@@ -5,11 +5,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MusicPlayer extends ConsumerWidget {
+class MusicPlayer extends ConsumerStatefulWidget {
   const MusicPlayer({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MusicPlayer> createState() => _MusicPlayerState();
+}
+
+class _MusicPlayerState extends ConsumerState<MusicPlayer> {
+  double _sliderValue = 0.0;
+  bool _isDragging = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ref = this.ref;
     final currentSong = ref.watch(currentSongProvider);
     final songNotifier = ref.read(currentSongProvider.notifier);
     if (currentSong == null) {
@@ -119,11 +128,24 @@ class MusicPlayer extends ConsumerWidget {
                       final position = asyncSnapshot.data;
                       final duration = songNotifier.audioPlayer!.duration;
 
-                      double sliderValue = 0.0;
+                      String formatDuration(Duration? value) {
+                        if (value == null) {
+                          return '0:00';
+                        }
+
+                        final minutes = value.inMinutes;
+                        final seconds = value.inSeconds.remainder(60);
+
+                        return '$minutes:${seconds.toString().padLeft(2, '0')}';
+                      }
 
                       if (position != null && duration != null) {
-                        sliderValue =
+                        final computedValue =
                             position.inMilliseconds / duration.inMilliseconds;
+
+                        if (!_isDragging) {
+                          _sliderValue = computedValue.clamp(0.0, 1.0);
+                        }
                       }
 
                       return Column(
@@ -138,19 +160,32 @@ class MusicPlayer extends ConsumerWidget {
                               overlayShape: SliderComponentShape.noOverlay,
                             ),
                             child: Slider(
-                              value: sliderValue,
+                              value: _sliderValue,
                               min: 0,
                               max: 1,
-                              onChanged: (val) {
-                                sliderValue = val;
+                              onChangeStart: (_) {
+                                setState(() {
+                                  _isDragging = true;
+                                });
                               },
-                              onChangeEnd: songNotifier.seek,
+                              onChanged: (val) {
+                                setState(() {
+                                  _sliderValue = val;
+                                });
+                              },
+                              onChangeEnd: (val) {
+                                setState(() {
+                                  _isDragging = false;
+                                  _sliderValue = val;
+                                });
+                                songNotifier.seek(val);
+                              },
                             ),
                           ),
                           Row(
                             children: [
                               Text(
-                                '${position?.inMinutes}:${(position?.inSeconds ?? 0) < 10 ? '0${position?.inSeconds}' : '${position?.inSeconds}'}',
+                                formatDuration(position),
                                 style: TextStyle(
                                   color: ColorPalette.subtitleText,
                                   fontSize: 13,
@@ -159,7 +194,7 @@ class MusicPlayer extends ConsumerWidget {
                               ),
                               Expanded(child: SizedBox()),
                               Text(
-                                '${duration?.inMinutes}:${(duration?.inSeconds ?? 0) < 10 ? '0${duration?.inSeconds}' : '${duration?.inSeconds}'}',
+                                formatDuration(duration),
                                 style: TextStyle(
                                   color: ColorPalette.subtitleText,
                                   fontSize: 13,
